@@ -1,0 +1,7 @@
+{
+  "name": "Copy of ClearPath",
+  "description": "A digital platform for students to track clearance status, staff to manage approvals, and administrators to generate reports, streamlining the university clearance process.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
