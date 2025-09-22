@@ -105,17 +105,17 @@ const staff: Staff[] = [
   ...subjectTeachers,
 ];
 
+
 const users: (Student | Staff)[] = [...students, ...staff];
 
 export const mockApiService = {
   authenticate: async (email: string, password: string, role: Role): Promise<User | null> => {
     return new Promise(resolve => {
       setTimeout(() => {
-        // Universal password check for the prototype
         if (password !== 'password123') {
           resolve(null);
           return;
-        }
+        } 
         const user = users.find(u => (u.email === email || u.id === email || (u.role === Role.Student && (u as Student).studentId === email)) && u.role === role);
         resolve(user || null);
       }, 500);

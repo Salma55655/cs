@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, role: Role) => Promise<boolean>;
   logout: () => void;
-  isLoading: boolean;
+  isLoading: boolean; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

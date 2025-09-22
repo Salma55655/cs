@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { mockApiService } from '../services/mockData';
 import { Role, ClearanceStatus, type Student, type Book, type Fine, type Approval, type SubjectClearance } from '../types';
+import { apiService } from "../services/apiService";
 
 // Declare jsPDF and QRCode to satisfy TypeScript since they are loaded from CDN
 declare const jspdf: any;
@@ -309,16 +310,35 @@ export const StudentDashboard: React.FC = () => {
     const [isCleared, setIsCleared] = useState(false);
     const [showClearedModal, setShowClearedModal] = useState(false);
 
-    const fetchData = useCallback(async () => {
-        if (user) {
-            const data = await mockApiService.getStudentById(user.id);
-            setStudentData(data);
-        }
-    }, [user]);
+    // const fetchData = useCallback(async () => {
+    //     if (user) {
+    //         const data = await apiService.getStudentById(user.id);
+    //         setStudentData(data);
+    //     }
+    // }, [user]);
+
+    // useEffect(() => {
+    //     fetchData();
+    // }, [fetchData]);
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = await apiService.getStudentById(user.id);
+                setStudentData(data);
+            } catch (err: any) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchData();
-    }, [fetchData]);
+    }, [user]);
+
 
     useEffect(() => {
         if (studentData) {
@@ -337,7 +357,7 @@ export const StudentDashboard: React.FC = () => {
     }, [studentData, isCleared]);
 
     const handleUpdateStudent = async (updatedStudent: Student) => {
-        const savedData = await mockApiService.updateStudentData(updatedStudent);
+        const savedData = await apiService.updateStudentData(updatedStudent);
         setStudentData(savedData);
     };
 
@@ -474,7 +494,7 @@ const BaseStaffDashboard: React.FC<{ userRole: Role, pageTitle: string, approval
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
     const fetchData = useCallback(async () => {
-        const data = await mockApiService.getAllStudents();
+        const data = await apiService.getAllStudents();
         setStudents(data);
     }, []);
 
@@ -483,7 +503,7 @@ const BaseStaffDashboard: React.FC<{ userRole: Role, pageTitle: string, approval
     }, [fetchData]);
 
     const handleUpdate = async (updatedStudent: Student) => {
-        const saved = await mockApiService.updateStudentData(updatedStudent);
+        const saved = await apiService.updateStudentData(updatedStudent);
         setStudents(prev => prev.map(s => s.id === saved.id ? saved : s));
     };
 
@@ -613,7 +633,7 @@ export const SubjectTeacherDashboard: React.FC = () => {
 
     const fetchData = useCallback(async () => {
         if (!user) return;
-        const allStudents = await mockApiService.getAllStudents();
+        const allStudents = await apiService.getAllStudents();
         const filtered = allStudents.filter(s => s.subjectClearances.some(sc => sc.teacherId === user.id));
         setMyStudents(filtered);
     }, [user]);
@@ -623,7 +643,7 @@ export const SubjectTeacherDashboard: React.FC = () => {
     }, [fetchData]);
 
     const handleUpdate = async (updatedStudent: Student) => {
-        const saved = await mockApiService.updateStudentData(updatedStudent);
+        const saved = await apiService.updateStudentData(updatedStudent);
         setMyStudents(prev => prev.map(s => s.id === saved.id ? saved : s));
     };
     
@@ -714,7 +734,7 @@ export const SecurityDashboard: React.FC = () => {
 
     const handleSearch = async () => {
         setFoundStudent(undefined);
-        const allStudents = await mockApiService.getAllStudents();
+        const allStudents = await apiService.getAllStudents();
         const student = allStudents.find(s => s.studentId === searchId);
         setFoundStudent(student || null);
     };
@@ -726,7 +746,7 @@ export const SecurityDashboard: React.FC = () => {
             const studentId = "ALA2025-002"; // Pre-cleared student
             setSearchId(studentId);
             setIsScanning(false);
-            mockApiService.getAllStudents().then(allStudents => {
+            apiService.getAllStudents().then(allStudents => {
                 const student = allStudents.find(s => s.studentId === studentId);
                 setFoundStudent(student || null);
             });
