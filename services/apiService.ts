@@ -2,21 +2,21 @@ import axios from 'axios';
 import { Student } from '../types';
 
 
-const API_BASE = ' http://localhost:4000/api'; // replace with your real backend URL
+const API_BASE = 'https://backendclearance.vercel.app'; // replace with your real backend URL
 
 export const apiService = {
   getStudentById: async (id: string): Promise<Student> => {
-    const res = await axios.get(`${API_BASE}/students/${id}`);
+    const res = await axios.get(`${API_BASE}/api/students/${id}`);
     return res.data;
   },
 
   getAllStudents: async (): Promise<Student[]> => {
-    const res = await axios.get(`${API_BASE}/students`);
+    const res = await axios.get(`${API_BASE}/api/students`);
     return res.data;
   },
 
   updateStudentData: async (student: Student): Promise<Student> => {
-    const res = await axios.put(`${API_BASE}/students/${student.id}`, student);
+    const res = await axios.put(`${API_BASE}/api/students/${student.id}`, student);
     return res.data;
   },
 };
